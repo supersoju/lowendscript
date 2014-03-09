@@ -477,11 +477,11 @@ Hello World
 END
 
 	# Setup test phpinfo.php file
-	echo "<?php phpinfo(); ?>" > /var/www/$1/public/phpinfo.php
-	chown www-data:www-data "/var/www/$1/public/phpinfo.php"
+	# echo "<?php phpinfo(); ?>" > /var/www/$1/public/phpinfo.php
+	# chown www-data:www-data "/var/www/$1/public/phpinfo.php"
 
 	# Setting up Nginx mapping
-	cat > "/etc/nginx/sites-available/$1.conf" <<END
+	cat > "/etc/nginx/sites-available/${1:0:15}.conf" <<END
 server {
 	listen 80;
 	server_name www.$1 $1;
@@ -519,7 +519,7 @@ server {
 }
 END
 	# Create the link so nginx can find it
-	ln -s /etc/nginx/sites-available/$1.conf /etc/nginx/sites-enabled/$1.conf
+	ln -s /etc/nginx/sites-available/${1:0:15}.conf /etc/nginx/sites-enabled/${1:0:15}.conf
 
 	# PHP/Nginx needs permission to access this
 	chown www-data:www-data -R "/var/www/$1"
@@ -527,7 +527,7 @@ END
 	invoke-rc.d nginx restart
 
 	print_warn "New site successfully installed."
-	print_warn "You may can test PHP functionality by accessing $1/phpinfo.php"
+	#print_warn "You may can test PHP functionality by accessing $1/phpinfo.php"
 }
 
 function install_wordpress {
@@ -576,7 +576,7 @@ END
         mysql
 
 	# Setting up Nginx mapping
-	cat > "/etc/nginx/sites-available/$1.conf" <<END
+	cat > "/etc/nginx/sites-available/${1:0:15}.conf" <<END
 server {
 	listen 80;
 	server_name www.$1 $1;
@@ -652,7 +652,7 @@ server {
 
 END
 	# Create the link so nginx can find it
-	ln -s /etc/nginx/sites-available/$1.conf /etc/nginx/sites-enabled/$1.conf
+	ln -s /etc/nginx/sites-available/${1:0:15}.conf /etc/nginx/sites-enabled/${1:0:15}.conf
 
 	# PHP/Nginx needs permission to access this
 	chown www-data:www-data -R "/var/www/$1"
