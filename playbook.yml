@@ -1,0 +1,89 @@
+---
+- hosts: all
+  user: root
+  tasks:
+  - name: Remove Unnessary
+    apt: >
+      pkg={{ item }}
+      state=absent
+      purge=yes
+      force=yes
+    with_items:
+      - portmap
+      - rsyslog
+      - apache2*
+      - bind9*
+      - samba*
+      - nscd
+      - sendmail*
+
+  - name: Apt-get update
+    shell: apt-get -q -y update
+
+  - name: Apt-get upgrade
+    shell: apt-get -q -y upgrade
+
+  - name: Apt-get autoremove
+    shell: apt-get -q -y autoremove
+
+  - name: Install zsh
+    apt: pkg=zsh state=present
+
+  - name: Install Vim
+    apt: pkg=vim state=present
+  
+  - name: Install htop
+    apt: pkg=htop state=present
+  
+  - name: Install mc
+    apt: pkg=mc state=present
+    apt: pkg=ed state=present
+  
+  - name: Install syslogd
+    apt: pkg=syslogd state=present
+  
+  - name: Clean up step 1
+    shell: apt-get -q -y autoclean
+  
+  - name: Clean up step 2
+    shell: apt-get -q -y clean
+  
+  - name: Install curl
+    apt: pkg=curl state=present
+
+  - name: Get custom shell script
+    shell: curl -o /root/setup-debian.sh https://raw.githubusercontent.com/supersoju/lowendscript/master/setup-debian.sh
+
+  - name: Chmod shell script
+    shell: chmod a+x /root/setup-debian.sh
+
+  - name: Install MySQL Server
+    apt: pkg=mysql-server state=present
+
+  - name: Install MySQL Client
+    apt: pkg=mysql-client state=present
+
+  # Need to download a new MySQL my.cnf here, not sure how yet.
+  - name: Configure MySQL
+    shell: /root/setup-debian.sh mysql
+
+  - name: Install NginX
+    apt: pkg=nginx state=present
+
+  # Install custom Nginx configs
+  - name: Configure NginX
+    shell: /root/setup-debian.sh nginx
+
+  - name: Install PHP-FPM
+    apt: pkg=php5-fpm state=present
+    apt: pkg=php5-cli state=present
+    apt: pkg=php-apc state=present
+  
+  - name: Configure PHP
+    shell: /root/setup-debian.sh php
+  
+  - name: Configure exim4
+    shell: /root/setup-debian.sh exim4
+  
+  - name: Install WordPress site from CLI
+    shell: /root/setup-debian.sh wordpress {{ site_url }}
